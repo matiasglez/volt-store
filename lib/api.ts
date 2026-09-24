@@ -240,5 +240,11 @@ export const api = {
       body: { order_id, payment_method: paymentMethod },
       auth: true,
     }),
+  confirmMercadoPago: (order_id: number, payment_id: string) =>
+    request<Payment>('/payments/confirm/', {
+      method: 'POST',
+      body: { order_id, payment_id },
+      auth: true,
+    }),
   getPayments: () => request<Paginated<Payment> | Payment[]>('/payments/', { auth: true }),
 }

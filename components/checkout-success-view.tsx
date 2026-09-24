@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { CheckCircle2, Loader2 } from 'lucide-react'
-import { api } from '@/lib/api'
+import { CheckCircle2, Loader2, RefreshCw } from 'lucide-react'
+import { api, friendlyError } from '@/lib/api'
 import type { Order } from '@/lib/types'
 import { OrderStatusBadge } from '@/components/order-status-badge'
 import { formatPrice } from '@/lib/format'
@@ -15,12 +15,54 @@ export function CheckoutSuccessView() {
   const { isAuthenticated, ready } = useAuth()
   const orderId =
     params.get('order_id') || params.get('external_reference') || null
+  const paymentId = params.get('payment_id') || null
 
   const [order, setOrder] = useState<Order | null>(null)
   const [polling, setPolling] = useState(false)
+  const [confirmed, setConfirmed] = useState(!paymentId)
+  const [confirming, setConfirming] = useState(false)
+  const [confirmError, setConfirmError] = useState<string | null>(null)
+  const [retry, setRetry] = useState(0)
 
+  // Confirmación una sola vez al volver de Mercado Pago con payment_id.
   useEffect(() => {
-    if (!ready || !isAuthenticated || !orderId) return
+    if (!ready || !isAuthenticated || !orderId || !paymentId || confirmed) return
+    let active = true
+    setConfirming(true)
+    setConfirmError(null)
+
+    const run = async () => {
+      try {
+        await api.confirmMercadoPago(Number(orderId), paymentId)
+      } catch (e) {
+        if (active) {
+          setConfirmError(
+            friendlyError(e, 'Todavía no pudimos confirmar el pago.'),
+          )
+        }
+      } finally {
+        if (active) {
+          setConfirmed(true)
+          setConfirming(false)
+        }
+      }
+    }
+
+    void run()
+    return () => {
+      active = false
+    }
+  }, [ready, isAuthenticated, orderId, paymentId, confirmed, retry])
+
+  // Reintento manual si la confirmación falló.
+  const retryConfirm = () => {
+    setConfirmed(false)
+    setRetry((r) => r + 1)
+  }
+
+  // Cargamos y poll de la orden (espera a que termine la confirmación).
+  useEffect(() => {
+    if (!ready || !isAuthenticated || !orderId || !confirmed) return
     let active = true
     let tries = 0
     setPolling(true)
@@ -47,7 +89,10 @@ export function CheckoutSuccessView() {
     return () => {
       active = false
     }
-  }, [ready, isAuthenticated, orderId])
+  }, [ready, isAuthenticated, orderId, confirmed])
+
+  const isPending =
+    order !== null && order.status === 'PENDING' && confirming === false
 
   return (
     <main className="mx-auto flex max-w-lg flex-col items-center px-4 py-20 text-center sm:px-6">
@@ -58,8 +103,9 @@ export function CheckoutSuccessView() {
         ¡Gracias por tu compra!
       </h1>
       <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
-        Recibimos tu pago. La confirmación puede tardar unos instantes en
-        acreditarse; vamos a actualizar el estado de tu pedido en breve.
+        {confirming
+          ? 'Estamos confirmando tu pago con Mercado Pago, un momento…'
+          : 'Recibimos tu pago. La confirmación puede tardar unos instantes en acreditarse; vamos a actualizar el estado de tu pedido en breve.'}
       </p>
 
       {orderId && (
@@ -71,6 +117,11 @@ export function CheckoutSuccessView() {
             </div>
             {order ? (
               <OrderStatusBadge status={order.status} />
+            ) : confirming ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Loader2 className="size-3.5 animate-spin" />
+                Confirmando
+              </span>
             ) : polling ? (
               <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="size-3.5 animate-spin" />
@@ -85,6 +136,36 @@ export function CheckoutSuccessView() {
                 {formatPrice(order.total_cost)}
               </span>
             </div>
+          )}
+
+          {isPending && (
+            <div className="mt-5 flex flex-col gap-2 rounded-xl border border-amber-300/25 bg-amber-300/5 p-4 text-left">
+              <p className="text-sm text-amber-300">
+                Tu pago figura pendiente en Mercado Pago. Puede tardar unos
+                minutos en acreditarse.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={retryConfirm}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/85"
+                >
+                  <RefreshCw className="size-3.5" />
+                  Reintentar confirmación
+                </button>
+                <Link
+                  href="/orders"
+                  className="text-xs font-medium text-accent hover:underline"
+                >
+                  Ver mis pedidos
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {confirmError && !isPending && (
+            <p className="mt-5 rounded-xl border border-destructive/25 bg-destructive/5 p-4 text-sm text-destructive">
+              {confirmError}
+            </p>
           )}
         </div>
       )}
