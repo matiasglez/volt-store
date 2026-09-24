@@ -77,7 +77,7 @@ export default function CartPage() {
           <div>
             <p className="font-medium">Tu carrito está vacío</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Descubrí objetos con calidez para tu casa.
+              Equipate para tu próxima sesión.
             </p>
           </div>
           <Link

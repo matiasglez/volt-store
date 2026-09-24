@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { ShoppingBag, User, LogOut, Menu, X } from 'lucide-react'
+import { ShoppingBag, User, LogOut, Menu, X, Zap } from 'lucide-react'
 import { useAuth } from './auth-provider'
 import { useCart } from './cart-provider'
 import { cn } from '@/lib/utils'
@@ -22,12 +22,10 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="group flex items-baseline gap-1.5" onClick={() => setOpen(false)}>
-          <span className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Nova
-          </span>
-          <span className="font-display text-2xl font-semibold tracking-tight text-accent">
-            Store
+        <Link href="/" className="group flex items-center gap-1.5" onClick={() => setOpen(false)}>
+          <Zap className="size-5 fill-accent text-accent transition-transform group-hover:scale-110" />
+          <span className="font-display text-2xl font-normal uppercase tracking-tight text-foreground">
+            Volt
           </span>
         </Link>
 

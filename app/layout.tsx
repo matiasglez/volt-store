@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Fraunces, DM_Sans } from 'next/font/google'
+import { Anton, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth-provider'
 import { CartProvider } from '@/components/cart-provider'
@@ -8,11 +8,11 @@ import { ToastProvider } from '@/components/toast-provider'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 
-const fraunces = Fraunces({
+const anton = Anton({
   subsets: ['latin'],
-  variable: '--font-fraunces',
+  weight: '400',
+  variable: '--font-anton',
   display: 'swap',
-  axes: ['opsz'],
 })
 
 const dmSans = DM_Sans({
@@ -22,15 +22,14 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Nova Store — Objetos con calidez para tu casa',
+  title: 'VOLT — Tienda deportiva',
   description:
-    'Nova Store: tienda de objetos y textiles de diseño cálido. Envíos a todo el país y pago con Mercado Pago.',
-  generator: 'v0.app',
+    'VOLT: ropa y equipamiento deportivo para entrenar al máximo. Envíos a todo el país y pago con Mercado Pago.',
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#1A1A1A',
+  colorScheme: 'dark',
+  themeColor: '#101014',
 }
 
 export default function RootLayout({
@@ -39,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es-AR" className={`${fraunces.variable} ${dmSans.variable}`}>
+    <html lang="es-AR" className={`${anton.variable} ${dmSans.variable}`}>
       <body className="font-sans antialiased">
         <ToastProvider>
           <AuthProvider>

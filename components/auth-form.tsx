@@ -60,7 +60,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {isRegister
-            ? 'Sumate a Nova Store para comprar y seguir tus pedidos.'
+            ? 'Sumate a VOLT para comprar y seguir tus pedidos.'
             : 'Ingresá para ver tu carrito y tus pedidos.'}
         </p>
       </div>

@@ -16,8 +16,8 @@ export function FeaturedProducts() {
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-widest text-accent">Selección</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            Lo más querido
+          <h2 className="mt-2 font-display text-3xl font-normal uppercase tracking-tight sm:text-4xl">
+            Lo nuevo para entrenar
           </h2>
         </div>
         <Link

@@ -5,12 +5,12 @@ export function Footer() {
     <footer className="border-t border-border/70 bg-charcoal text-ivory">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div className="max-w-sm">
-          <p className="font-display text-2xl font-semibold">
-            Nova <span className="text-accent">Store</span>
+          <p className="font-display text-2xl font-normal uppercase tracking-tight">
+            Volt <span className="text-accent">Sports</span>
           </p>
           <p className="mt-3 text-sm leading-relaxed text-ivory/65">
-            Objetos y textiles de diseño cálido para tu casa. Curados a mano,
-            pensados para durar.
+            Ropa y equipamiento deportivo para entrenar al máximo. Probá el
+            demo completo: registro, carrito y pago simulado.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export function Footer() {
       </div>
       <div className="border-t border-ivory/10">
         <div className="mx-auto max-w-6xl px-4 py-5 text-xs text-ivory/45 sm:px-6">
-          © {new Date().getFullYear()} Nova Store. Hecho en Argentina.
+          © {new Date().getFullYear()} Volt Sports. Hecho en Argentina.
         </div>
       </div>
     </footer>
