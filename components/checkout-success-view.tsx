@@ -19,21 +19,22 @@ export function CheckoutSuccessView() {
 
   const [order, setOrder] = useState<Order | null>(null)
   const [polling, setPolling] = useState(false)
-  const [confirmed, setConfirmed] = useState(!paymentId)
+  const [confirmed, setConfirmed] = useState(!orderId)
   const [confirming, setConfirming] = useState(false)
   const [confirmError, setConfirmError] = useState<string | null>(null)
   const [retry, setRetry] = useState(0)
 
-  // Confirmación una sola vez al volver de Mercado Pago con payment_id.
+  // Confirmación una sola vez al volver de Mercado Pago. Si no viene
+  // payment_id, el backend busca el pago por external_reference.
   useEffect(() => {
-    if (!ready || !isAuthenticated || !orderId || !paymentId || confirmed) return
+    if (!ready || !isAuthenticated || !orderId || confirmed) return
     let active = true
     setConfirming(true)
     setConfirmError(null)
 
     const run = async () => {
       try {
-        await api.confirmMercadoPago(Number(orderId), paymentId)
+        await api.confirmMercadoPago(Number(orderId), paymentId ?? undefined)
       } catch (e) {
         if (active) {
           setConfirmError(
@@ -162,7 +163,7 @@ export function CheckoutSuccessView() {
             </div>
           )}
 
-          {confirmError && !isPending && (
+          {confirmError && isPending && (
             <p className="mt-5 rounded-xl border border-destructive/25 bg-destructive/5 p-4 text-sm text-destructive">
               {confirmError}
             </p>

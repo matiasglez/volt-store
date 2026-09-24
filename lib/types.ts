@@ -58,6 +58,12 @@ export interface OrderItem {
   [key: string]: unknown
 }
 
+export interface OrderPayment {
+  id: number
+  status: string
+  payment_method: string
+}
+
 export interface Order {
   id: number
   user: number | string
@@ -66,6 +72,7 @@ export interface Order {
   total_cost: string
   created_on: string
   expires_at: string | null
+  payment: OrderPayment | null
 }
 
 export interface Payment {

@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import useSWR from 'swr'
-import { ArrowLeft, CreditCard } from 'lucide-react'
+import useSWR, { useSWRConfig } from 'swr'
+import { ArrowLeft, CreditCard, Loader2, RefreshCw } from 'lucide-react'
 import { api, friendlyError } from '@/lib/api'
 import { formatDate, formatPrice } from '@/lib/format'
 import { OrderStatusBadge } from '@/components/order-status-badge'
@@ -11,10 +12,56 @@ import { useRequireAuth } from '@/hooks/use-require-auth'
 
 export function OrderDetail({ id }: { id: string }) {
   const { allowed, ready } = useRequireAuth()
+  const { mutate } = useSWRConfig()
   const { data: order, error, isLoading } = useSWR(
     allowed ? (['order', id] as const) : null,
     () => api.getOrder(id),
   )
+
+  const [checking, setChecking] = useState(false)
+  const [checkingDone, setCheckingDone] = useState(false)
+  const [checkError, setCheckError] = useState<string | null>(null)
+
+  const needsMpCheck =
+    !!order &&
+    order.status === 'PENDING' &&
+    order.payment?.payment_method === 'MERCADOPAGO' &&
+    !checkingDone
+
+  // Al abrir un pedido pendiente con pago Mercado Pago, reconciliamos con la
+  // API (sin depender de la redireccion de retorno) buscando por external_reference.
+  useEffect(() => {
+    if (!needsMpCheck || checking) return
+    let active = true
+    setChecking(true)
+    setCheckError(null)
+
+    const run = async () => {
+      try {
+        await api.confirmMercadoPago(order.id)
+        await mutate(['order', id])
+      } catch (e) {
+        if (active) {
+          setCheckError(friendlyError(e, 'Todavía no pudimos confirmar el pago.'))
+        }
+      } finally {
+        if (active) {
+          setChecking(false)
+          setCheckingDone(true)
+        }
+      }
+    }
+
+    void run()
+    return () => {
+      active = false
+    }
+  }, [needsMpCheck, checking, order, id, mutate])
+
+  const retryVerify = () => {
+    setCheckingDone(false)
+    setCheckError(null)
+  }
 
   if (!ready || !allowed || isLoading) {
     return (
@@ -94,6 +141,33 @@ export function OrderDetail({ id }: { id: string }) {
               <CreditCard className="size-4" />
               Pagar este pedido
             </Link>
+
+            {order.payment?.payment_method === 'MERCADOPAGO' && (
+              <div className="mt-3">
+                <button
+                  onClick={retryVerify}
+                  disabled={checking}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-60"
+                >
+                  {checking ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Verificando pago…
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="size-4" />
+                      Verificar pago
+                    </>
+                  )}
+                </button>
+                {checkError && (
+                  <p className="mt-3 rounded-xl border border-destructive/25 bg-destructive/5 p-3 text-xs leading-relaxed text-destructive">
+                    {checkError}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
