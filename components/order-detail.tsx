@@ -60,21 +60,22 @@ export function OrderDetail({ id }: { id: string }) {
         </div>
 
         <ul className="divide-y divide-border px-6">
-          {items.map((it) => (
-            <li key={it.id} className="flex items-center justify-between gap-4 py-4">
-              <div className="min-w-0">
-                <p className="truncate font-medium">
-                  {typeof it.product === 'object' && it.product?.name
-                    ? it.product.name
-                    : 'Artículo'}
-                </p>
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  {formatPrice(it.price)} × {it.quantity}
-                </p>
-              </div>
-              <span className="font-medium tabular-nums">{formatPrice(it.cost)}</span>
-            </li>
-          ))}
+          {items.map((it) => {
+            const name =
+              it.product_name ??
+              (typeof it.product === 'object' && it.product?.name ? it.product.name : 'Artículo')
+            return (
+              <li key={it.id} className="flex items-center justify-between gap-4 py-4">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{name}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {formatPrice(it.price)} × {it.quantity}
+                  </p>
+                </div>
+                <span className="font-medium tabular-nums">{formatPrice(it.cost)}</span>
+              </li>
+            )
+          })}
         </ul>
 
         <div className="flex items-center justify-between border-t border-border px-6 py-5">

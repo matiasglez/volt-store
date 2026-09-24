@@ -50,7 +50,8 @@ export type OrderStatus = 'PENDING' | 'PAID' | 'CANCELLED'
 
 export interface OrderItem {
   id: number
-  product: string | { id: string; name: string }
+  product: number | { id: string; name: string } | null
+  product_name?: string | null
   quantity: number
   price: string
   cost: string

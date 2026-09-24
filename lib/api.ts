@@ -231,10 +231,10 @@ export const api = {
   getOrder: (id: number | string) => request<Order>(`/orders/${id}/`, { auth: true }),
 
   // Payments
-  createPayment: (order_id: number) =>
-    request<Payment & { init_point?: string }>('/payments/create/', {
+  createPayment: (order_id: number, paymentMethod: 'MOCK' | 'MERCADOPAGO') =>
+    request<Payment>('/payments/create/', {
       method: 'POST',
-      body: { order_id, payment_method: 'MERCADOPAGO' },
+      body: { order_id, payment_method: paymentMethod },
       auth: true,
     }),
   getPayments: () => request<Paginated<Payment> | Payment[]>('/payments/', { auth: true }),

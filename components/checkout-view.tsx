@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import useSWR from 'swr'
-import { Clock, Loader2, ShieldCheck } from 'lucide-react'
+import { Clock, Loader2, ShieldCheck, Zap } from 'lucide-react'
 import { api, friendlyError } from '@/lib/api'
 import { formatPrice } from '@/lib/format'
 import { Badge } from '@/components/ui/badge'
@@ -45,6 +45,7 @@ function Countdown({ expiresAt }: { expiresAt: string }) {
 export function CheckoutView() {
   const { allowed, ready } = useRequireAuth()
   const params = useSearchParams()
+  const router = useRouter()
   const orderId = params.get('order_id')
   const { toast } = useToast()
   const [paying, setPaying] = useState(false)
@@ -54,17 +55,34 @@ export function CheckoutView() {
     () => api.getOrder(orderId as string),
   )
 
-  const handlePay = async () => {
+  const handlePayDemo = async () => {
     if (!order) return
     setPaying(true)
     try {
-      const payment = await api.createPayment(order.id)
+      const payment = await api.createPayment(order.id, 'MOCK')
+      if (payment.status === 'PAID') {
+        router.push(`/checkout/success?order_id=${order.id}`)
+        return
+      }
+      toast('El pago demo no se acreditó. Intentá de nuevo.', 'error')
+      setPaying(false)
+    } catch (e) {
+      toast(friendlyError(e, 'No pudimos completar el pago demo.'), 'error')
+      setPaying(false)
+    }
+  }
+
+  const handlePayMercadoPago = async () => {
+    if (!order) return
+    setPaying(true)
+    try {
+      const payment = await api.createPayment(order.id, 'MERCADOPAGO')
       if (payment.init_point) {
         window.location.href = payment.init_point
-      } else {
-        toast('No recibimos el enlace de pago. Intentá de nuevo.', 'error')
-        setPaying(false)
+        return
       }
+      toast('No recibimos el enlace de pago. Intentá de nuevo.', 'error')
+      setPaying(false)
     } catch (e) {
       toast(friendlyError(e, 'No pudimos iniciar el pago.'), 'error')
       setPaying(false)
@@ -118,17 +136,19 @@ export function CheckoutView() {
           </div>
 
           <ul className="divide-y divide-border px-6">
-            {order.order_items.map((it) => (
-              <li key={it.id} className="flex items-center justify-between gap-4 py-4 text-sm">
-                <span className="text-muted-foreground">
-                  {typeof it.product === 'object' && it.product?.name
-                    ? it.product.name
-                    : `Artículo`}{' '}
-                  <span className="text-foreground">× {it.quantity}</span>
-                </span>
-                <span className="font-medium tabular-nums">{formatPrice(it.cost)}</span>
-              </li>
-            ))}
+            {order.order_items.map((it) => {
+              const name =
+                it.product_name ??
+                (typeof it.product === 'object' && it.product?.name ? it.product.name : 'Artículo')
+              return (
+                <li key={it.id} className="flex items-center justify-between gap-4 py-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {name} <span className="text-foreground">× {it.quantity}</span>
+                  </span>
+                  <span className="font-medium tabular-nums">{formatPrice(it.cost)}</span>
+                </li>
+              )
+            })}
           </ul>
 
           <div className="flex items-center justify-between border-t border-border px-6 py-5">
@@ -142,9 +162,21 @@ export function CheckoutView() {
             {order.status === 'PENDING' ? (
               <>
                 <button
-                  onClick={handlePay}
+                  onClick={handlePayDemo}
                   disabled={paying}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 disabled:opacity-60"
+                >
+                  {paying ? <Loader2 className="size-4 animate-spin" /> : null}
+                  Pagar en modo demo
+                </button>
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                  <Zap className="size-3.5" />
+                  Pago simulado: la orden queda pagada al instante, sin credenciales reales.
+                </p>
+                <button
+                  onClick={handlePayMercadoPago}
+                  disabled={paying}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-6 py-3.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-60"
                 >
                   {paying ? <Loader2 className="size-4 animate-spin" /> : null}
                   Pagar con Mercado Pago
