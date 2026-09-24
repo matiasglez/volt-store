@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Coffee, Mail } from 'lucide-react'
+import { Coffee, GitBranch, Mail } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -59,6 +59,15 @@ export function Footer() {
             >
               <Coffee className="size-3.5" />
               ¿Me pagás un cafecito?
+            </a>
+            <a
+              href="https://github.com/matiasglez"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-ivory/20 px-3.5 py-2 text-xs font-medium text-ivory transition-colors hover:bg-ivory/10"
+            >
+              <GitBranch className="size-3.5" />
+              github.com/matiasglez
             </a>
           </div>
         </div>
