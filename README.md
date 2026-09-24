@@ -1,8 +1,17 @@
 # VOLT Store — Demo consumer for the e-commerce API
 
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6)
+![Tailwind](https://img.shields.io/badge/Tailwind-38BDF8)
+
 A Next.js storefront that works as a **demo consumer** for the [E-commerce API](https://github.com/matiasglez/ecommerce-backend): register, login with JWT, browse the sports catalog, filter by category, manage the cart, checkout and pay (demo mode or Mercado Pago).
 
 > **Role in the portfolio:** this is a secondary, demo-only interface. The main project is the **backend API** (Django REST Framework) — its tests, security and architecture are what matters. This storefront exists so anyone can try the API flows visually without touching Swagger.
+
+**Live demo:** https://volt-store-plum.vercel.app  
+**API docs:** https://volt-matiasglez-ecommerce.onrender.com/api/schema/swagger-ui/
+
+![Storefront](docs/screenshots/home.png)
 
 ## Stack
 
@@ -47,3 +56,4 @@ A Next.js storefront that works as a **demo consumer** for the [E-commerce API](
 ## Contact
 
 - Email: [matiasezequielgonzalez365@gmail.com](mailto:matiasezequielgonzalez365@gmail.com)
+- GitHub: [github.com/matiasglez](https://github.com/matiasglez)
