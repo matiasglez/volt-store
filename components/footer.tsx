@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Coffee, Mail } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -14,7 +15,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-4">
           <div className="flex flex-col gap-2.5">
             <span className="text-xs uppercase tracking-widest text-ivory/45">Tienda</span>
             <Link href="/products" className="text-ivory/80 transition-colors hover:text-accent">
@@ -40,6 +41,25 @@ export function Footer() {
             <span className="text-xs uppercase tracking-widest text-ivory/45">Pagos</span>
             <span className="text-ivory/80">Mercado Pago</span>
             <span className="text-ivory/80">Envíos a todo el país</span>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <span className="text-xs uppercase tracking-widest text-ivory/45">Contacto</span>
+            <a
+              href="mailto:matiasezequielgonzalez365@gmail.com"
+              className="inline-flex items-center gap-1.5 break-all text-ivory/80 transition-colors hover:text-accent"
+            >
+              <Mail className="size-3.5 shrink-0" />
+              matiasezequielgonzalez365@gmail.com
+            </a>
+            <a
+              href="https://mpago.la/2TXqyzt"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-ivory/20 px-3.5 py-2 text-xs font-medium text-ivory transition-colors hover:bg-ivory/10"
+            >
+              <Coffee className="size-3.5" />
+              ¿Me pagás un cafecito?
+            </a>
           </div>
         </div>
       </div>
