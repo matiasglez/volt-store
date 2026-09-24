@@ -43,3 +43,7 @@ A Next.js storefront that works as a **demo consumer** for the [E-commerce API](
 
 - The UI was initially generated with AI (v0) and then **connected, supervised and adjusted** against the real backend. API client: `lib/api.ts`.
 - Interactive API docs (OpenAPI/Swagger) live in the backend: `/api/schema/swagger-ui/`.
+
+## Contact
+
+- Email: [matiasezequielgonzalez365@gmail.com](mailto:matiasezequielgonzalez365@gmail.com)
