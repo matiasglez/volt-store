@@ -208,7 +208,10 @@ export const api = {
     return request<Paginated<Product>>(`/products/${qs ? `?${qs}` : ''}`)
   },
   getProduct: (id: string) => request<Product>(`/products/${id}/`),
-  getCategories: () => request<Category[]>('/products/categories/'),
+  getCategories: async () => {
+    const page = await request<Paginated<Category>>('/products/categories/')
+    return page.results
+  },
 
   // Cart
   getCart: () => request<Cart>('/cart/', { auth: true }),
